@@ -1,0 +1,8 @@
+# Unity cache folders
+/Library/
+/Temp/
+
+# Visual Studio project files
+/*.csproj
+/*.sln
+/.vs/
