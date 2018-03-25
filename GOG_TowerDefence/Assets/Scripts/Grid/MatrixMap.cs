@@ -1,11 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MatrixMap
 {
-    public class MatrixMapCell
+    public class MatrixMapCell : SettlersEngine.IPathNode<object>
     {
         public int X;
         public int Y;
@@ -20,34 +19,35 @@ namespace MatrixMap
             X = x;
             Y = y;
         }
-    }
 
-    public class MatrixMapCellList : List<MatrixMapCell>
-    {
-        public MatrixMapCell this[int x, int y]
+        public bool IsWalkable(object inContext)
         {
-            get { return this.FirstOrDefault(arg => arg.X == x && arg.Y == y); }
+            return FreeCell;
         }
     }
 
     public class MatrixMap : MonoBehaviour
     {
+        //!
+        public GameObject TowerEpta;
+        public MatrixMapCell[,] MatrixMapCells;
+
         //[SerializeField] private Vector2 _cellSize = Vector2.one;
         [SerializeField] private Vector2 _cellMatrixSize = new Vector2(25, 25);
         [SerializeField] private Vector2[] _schemeRadius;
 
         [SerializeField] private GridElement _gridElementPrefab;
 
-        public GameObject TowerEpta;
-
-        private readonly MatrixMapCellList _matrixMapCells = new MatrixMapCellList();
-        private readonly MatrixMapCellList _mapCellsAroundTower = new MatrixMapCellList();
+        //private readonly MatrixMapCellList _matrixMapCells = new MatrixMapCellList();
+        private MatrixMapCell[,] _mapCellsAroundTower;
 
         //public GameObject[] RadiusObjects;
 
         private void Awake()
         {
-            //_gridElementPrefab.transform.localScale = new Vector3(_cellSize.x, 1, _cellSize.y);
+            MatrixMapCells = new MatrixMapCell[25, 25];
+
+            //_gridElementPrefab.transform.localScale = new Vector3(_cellSize.X, 1, _cellSize.Y);
 
             for (var i = 0; i < _cellMatrixSize.x; i++)
             {
@@ -60,11 +60,12 @@ namespace MatrixMap
                     gridElement.gameObject.transform.SetParent(transform);
 
                     var cell = new MatrixMapCell(gridElement, x, y);
-                    _matrixMapCells.Add(cell);
+
+                    MatrixMapCells[x, y] = cell;
 
                     gridElement.Init(cell, 
                         (element, hover) => OnGridElementHover(element, hover, x, y),
-                        plant => OnGridElementPlant(gridElement, x, y));
+                        OnGridElementPlant);
                 }
             }
 
@@ -75,13 +76,16 @@ namespace MatrixMap
         {
             if (TowerEpta == null) return;
 
-            _mapCellsAroundTower.Clear();
+            _mapCellsAroundTower = new MatrixMapCell[25, 25];
 
             foreach (var element in _schemeRadius)
             {
-                var elementAround = _matrixMapCells[x + (int)element.x, y + (int)element.y];
+                var xPos = x + (int) element.x;
+                var yPos = y + (int) element.y;
 
-                _mapCellsAroundTower.Add(elementAround);
+                var elementAround = MatrixMapCells[xPos, yPos];
+
+                _mapCellsAroundTower[xPos, yPos] = elementAround;
 
                 if (status)
                 {
@@ -105,10 +109,12 @@ namespace MatrixMap
             }
         }
 
-        private void OnGridElementPlant(GridElement gridElement, int x, int y)
+        private void OnGridElementPlant(GridElement gridElement)
         {
-            if (_mapCellsAroundTower.Any(element => !element.FreeCell)) {
-                return;
+            foreach (var element in _mapCellsAroundTower)
+            {
+                if (!element.FreeCell)
+                    return;
             }
 
             gridElement.SetActiveTower(TowerEpta);
@@ -121,7 +127,7 @@ namespace MatrixMap
 
             TowerEpta = null;
 
-            _mapCellsAroundTower.Clear();
+            _mapCellsAroundTower = new MatrixMapCell[25, 25];
         }
 
         public Vector2[] standart_region()
@@ -166,7 +172,7 @@ namespace MatrixMap
             //}
         }
 
-        //public Vector2 GetPositionMatrix(float x, float y)
+        //public Vector2 GetPositionMatrix(float X, float Y)
         //{
         //    var positionMatrix = new Vector2();
 
@@ -177,13 +183,13 @@ namespace MatrixMap
         //        var xcalc = (point.X - point.SizeX) / 2;
         //        var ycalc = (point.Y - point.SizeY) / 2;
 
-        //        if (point.X + xcalc < x
-        //            && point.X + point.SizeX + xcalc > x
-        //            && point.Y + ycalc < y
-        //            && point.Y + ycalc + point.SizeY > y)
+        //        if (point.X + xcalc < X
+        //            && point.X + point.SizeX + xcalc > X
+        //            && point.Y + ycalc < Y
+        //            && point.Y + ycalc + point.SizeY > Y)
         //        {
-        //            positionMatrix.x = point.X;
-        //            positionMatrix.y = point.Y;
+        //            positionMatrix.X = point.X;
+        //            positionMatrix.Y = point.Y;
 
         //            RenderMatrixToMap(i);
         //        }
@@ -199,22 +205,22 @@ namespace MatrixMap
         //        var sRadius = _schemeRadius[i];
         //        var indexEnd = index;
 
-        //        if (Math.Abs(sRadius.y) > Mathf.Epsilon)
+        //        if (Math.Abs(sRadius.Y) > Mathf.Epsilon)
         //        {
-        //            var error = Mathf.Abs((int) sRadius.y) * (int) _cellMatrixSize.y;
+        //            var error = Mathf.Abs((int) sRadius.Y) * (int) _cellMatrixSize.Y;
 
-        //            indexEnd = sRadius.y < 0
+        //            indexEnd = sRadius.Y < 0
         //                ? index + error
         //                : index - error;
         //        }
 
-        //        var xRadius = Mathf.Abs((int)sRadius.x);
+        //        var xRadius = Mathf.Abs((int)sRadius.X);
 
-        //        if (sRadius.x < 0)
+        //        if (sRadius.X < 0)
         //        {
         //            indexEnd += xRadius;
         //        }
-        //        else if (sRadius.x > 0)
+        //        else if (sRadius.X > 0)
         //        {
         //            indexEnd -= xRadius;
         //        }
