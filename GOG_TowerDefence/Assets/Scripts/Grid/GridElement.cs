@@ -24,7 +24,7 @@ namespace MatrixMap
         private Action<GridElement> _onPlant;
 
         private EGridElementState _currentState;
-        private GameObject _currentTower;
+        private Tower _currentTower;
 
         public void Init(MatrixMapCell cell, Action<GridElement, bool> onHover, Action<GridElement> onPlant)
         {
@@ -36,7 +36,7 @@ namespace MatrixMap
             _onPlant = onPlant;
         }
 
-        public void SetActiveTower(GameObject tower)
+        public void SetActiveTower(Tower tower)
         {
             _currentTower = tower;
         }

@@ -20,10 +20,20 @@ namespace Assets.Scripts.Enemy
         }
     }
 
-    public class EnemyAStar : MonoBehaviour
+    public class EnemyPathfinding : MonoBehaviour
     {
+        private enum EPathFormula
+        {
+            Eucledian,
+            EucledianSquared,
+            Diagonal,
+            Manhatten
+        }
+
         [SerializeField] private MatrixMap.MatrixMap _matrixMap;
         [SerializeField] private float _moveSpeed;
+
+        private const EPathFormula Formula = EPathFormula.Eucledian;
 
         private MatrixMapCell _nextNode;
 
@@ -42,16 +52,19 @@ namespace Assets.Scripts.Enemy
         {
             protected override double Heuristic(PathNode inStart, PathNode inEnd)
             {
-                var formula = 2;
                 var dx = Math.Abs(inStart.X - inEnd.X);
                 var dy = Math.Abs(inStart.Y - inEnd.Y);
 
-                switch (formula)
+                switch (Formula)
                 {
-                    case 0: return Math.Sqrt(dx * dx + dy * dy); //Euclidean distance
-                    case 1: return (dx * dx + dy * dy); //Euclidean distance squared
-                    case 2: return Math.Min(dx, dy); //Diagonal distance
-                    case 3: return (dx * dy) + (dx + dy); //Manhatten distance
+                    case EPathFormula.Eucledian:
+                        return Math.Sqrt(dx * dx + dy * dy);
+                    case EPathFormula.EucledianSquared:
+                        return (dx * dx + dy * dy);
+                    case EPathFormula.Diagonal:
+                        return Math.Min(dx, dy);
+                    case EPathFormula.Manhatten:
+                        return (dx * dy) + (dx + dy);
                 }
 
                 return Math.Abs(inStart.X - inEnd.X) + Math.Abs(inStart.Y - inEnd.Y);
@@ -62,10 +75,12 @@ namespace Assets.Scripts.Enemy
                 return Heuristic(inStart, inEnd);
             }
 
-            public MySolver(TPathNode[,] inGrid) : base(inGrid) { }
+            public MySolver(TPathNode[,] inGrid) : base(inGrid)
+            {
+            }
         }
 
-        private void Awake()
+        public void Init()
         {
             _startGridPosition = new GridPosition(0, 0);
             _endGridPosition = new GridPosition(10, 10);
@@ -86,6 +101,8 @@ namespace Assets.Scripts.Enemy
 
         public void FindUpdatedPath(int currentX, int currentY)
         {
+            if (_matrixMap.MatrixMapCells == null) return;
+
             var aStar = new MySolver<MatrixMapCell, object>(_matrixMap.MatrixMapCells);
             var path = aStar.Search(new Vector2(currentX, currentY), new Vector2(_endGridPosition.X, _endGridPosition.Y), null);
 
@@ -102,20 +119,11 @@ namespace Assets.Scripts.Enemy
                     }
 
                     x++;
-
                 }
-
-                //foreach(GameObject g in GameObject.FindGameObjectsWithTag("GridBox"))
-                //{
-                //	if(g.GetComponent<Renderer>().material.color != Color.red && g.GetComponent<Renderer>().material.color == _myColor)
-                //		g.GetComponent<Renderer>().material.color = Color.white;
-                //}
-
-
-                //foreach (MyPathNode node in path)
-                //{
-                //	GameObject.Find(node.X + "," + node.Y).GetComponent<Renderer>().material.color = _myColor;
-                //}
+            }
+            else
+            {
+                Debug.LogError("I'm stuck!");
             }
         }
 
@@ -126,7 +134,7 @@ namespace Assets.Scripts.Enemy
                 StartCoroutine(Co_Move());
             }
         }
-    
+
         public IEnumerator Co_Move()
         {
             _isMoving = true;
@@ -134,19 +142,18 @@ namespace Assets.Scripts.Enemy
             _time = 0;
             _factor = 1f;
 
-            _endPosition = new Vector2(_startPosition.x + Math.Sign(_input.x),
-                                       _startPosition.y + Math.Sign(_input.y));
+            _endPosition = new Vector2(_startPosition.x + Math.Sign(_input.x), _startPosition.y + Math.Sign(_input.y));
 
             _currentGridPosition.X += Math.Sign(_input.x);
             _currentGridPosition.Y += Math.Sign(_input.y);
 
             while (_time < 1f)
             {
-                _time += Time.deltaTime * _moveSpeed * _factor;
+                _time += Time.deltaTime*_moveSpeed*_factor;
                 transform.position = Vector2.Lerp(_startPosition, _endPosition, _time);
                 yield return null;
             }
-            
+
             _isMoving = false;
             GetNextMovement();
 
@@ -161,7 +168,7 @@ namespace Assets.Scripts.Enemy
         private void GetNextMovement()
         {
             UpdatePath();
-            
+
             _input.x = 0;
             _input.y = 0;
 

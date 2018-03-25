@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,26 +27,33 @@ namespace MatrixMap
         }
     }
 
+    public class MatrixMapCellList : List<MatrixMapCell>
+    {
+        public MatrixMapCell this[int x, int y]
+        {
+            get { return this.FirstOrDefault(arg => arg.X == x && arg.Y == y); }
+        }
+    }
+
     public class MatrixMap : MonoBehaviour
     {
-        //!
-        public GameObject TowerEpta;
-        public MatrixMapCell[,] MatrixMapCells;
-
-        //[SerializeField] private Vector2 _cellSize = Vector2.one;
         [SerializeField] private Vector2 _cellMatrixSize = new Vector2(25, 25);
         [SerializeField] private Vector2[] _schemeRadius;
 
         [SerializeField] private GridElement _gridElementPrefab;
 
-        //private readonly MatrixMapCellList _matrixMapCells = new MatrixMapCellList();
-        private MatrixMapCell[,] _mapCellsAroundTower;
+        public MatrixMapCell[,] MatrixMapCells;
 
-        //public GameObject[] RadiusObjects;
+        private readonly MatrixMapCellList _mapCellsAroundTower = new MatrixMapCellList();
+        private Action<Tower> _onTowerPlant;
 
-        private void Awake()
+        private Tower _selectedTower;
+
+        public void Init(Action<Tower> onTowerPlant)
         {
-            MatrixMapCells = new MatrixMapCell[25, 25];
+            _onTowerPlant = onTowerPlant;
+
+            MatrixMapCells = new MatrixMapCell[(int)_cellMatrixSize.x, (int)_cellMatrixSize.y];
 
             //_gridElementPrefab.transform.localScale = new Vector3(_cellSize.X, 1, _cellSize.Y);
 
@@ -65,34 +73,36 @@ namespace MatrixMap
 
                     gridElement.Init(cell, 
                         (element, hover) => OnGridElementHover(element, hover, x, y),
-                        OnGridElementPlant);
+                        plant => OnGridElementPlant(gridElement, x, y));
                 }
             }
 
             _schemeRadius = standart_region();
         }
 
+        public void SetSelectedTower(Tower tower)
+        {
+            _selectedTower = tower;
+        }
+
         private void OnGridElementHover(GridElement gridElement, bool status, int x, int y)
         {
-            if (TowerEpta == null) return;
+            if (_selectedTower == null) return;
 
-            _mapCellsAroundTower = new MatrixMapCell[25, 25];
+            _mapCellsAroundTower.Clear();
 
             foreach (var element in _schemeRadius)
             {
-                var xPos = x + (int) element.x;
-                var yPos = y + (int) element.y;
+                var elementAround = MatrixMapCells[x + (int)element.x, y + (int)element.y];
 
-                var elementAround = MatrixMapCells[xPos, yPos];
-
-                _mapCellsAroundTower[xPos, yPos] = elementAround;
+                _mapCellsAroundTower.Add(elementAround);
 
                 if (status)
                 {
-                    gridElement.SetActiveTower(TowerEpta);
+                    gridElement.SetActiveTower(_selectedTower);
 
-                    TowerEpta.transform.SetParent(gridElement.transform);
-                    TowerEpta.transform.localPosition = Vector3.zero;
+                    //_selectedTower.transform.SetParent(gridElement.transform);
+                    _selectedTower.transform.position = gridElement.transform.position;
 
                     var availableStatus = elementAround.FreeCell
                         ? EGridElementState.Available
@@ -109,15 +119,17 @@ namespace MatrixMap
             }
         }
 
-        private void OnGridElementPlant(GridElement gridElement)
+        private void OnGridElementPlant(GridElement gridElement, int x, int y)
         {
-            foreach (var element in _mapCellsAroundTower)
-            {
-                if (!element.FreeCell)
-                    return;
+            if (_selectedTower == null)
+                return;
+
+            if (_mapCellsAroundTower.Any(element => !element.FreeCell)) {
+                return;
             }
 
-            gridElement.SetActiveTower(TowerEpta);
+            _onTowerPlant.Invoke(_selectedTower);
+            gridElement.SetActiveTower(_selectedTower);
 
             foreach (var element in _mapCellsAroundTower)
             {
@@ -125,9 +137,9 @@ namespace MatrixMap
                 element.FreeCell = false;
             }
 
-            TowerEpta = null;
+            _selectedTower = null;
 
-            _mapCellsAroundTower = new MatrixMapCell[25, 25];
+            _mapCellsAroundTower.Clear();
         }
 
         public Vector2[] standart_region()
@@ -154,90 +166,5 @@ namespace MatrixMap
 
             return returnMatrix;
         }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.F1))
-            {
-                RefreshMatrixCursor();
-            }
-        }
-
-        public void RefreshMatrixCursor()
-        {
-            //RadiusObjects = new GameObject[_schemeRadius.Length];
-
-            //for (var i = 0; i < _schemeRadius.Length; i++) {
-            //    RadiusObjects[i] = Instantiate(_gridElementPrefab, Vector3.zero, Quaternion.identity);
-            //}
-        }
-
-        //public Vector2 GetPositionMatrix(float X, float Y)
-        //{
-        //    var positionMatrix = new Vector2();
-
-        //    for (var i = 0; i < _matrixMapCells.Count; i++)
-        //    {
-        //        var point = _matrixMapCells[i];
-
-        //        var xcalc = (point.X - point.SizeX) / 2;
-        //        var ycalc = (point.Y - point.SizeY) / 2;
-
-        //        if (point.X + xcalc < X
-        //            && point.X + point.SizeX + xcalc > X
-        //            && point.Y + ycalc < Y
-        //            && point.Y + ycalc + point.SizeY > Y)
-        //        {
-        //            positionMatrix.X = point.X;
-        //            positionMatrix.Y = point.Y;
-
-        //            RenderMatrixToMap(i);
-        //        }
-        //    }
-
-        //    return positionMatrix;
-        //}
-
-        //public void RenderMatrixToMap(int index)
-        //{
-        //    for (var i = 0; i < _schemeRadius.Length; i++)
-        //    {
-        //        var sRadius = _schemeRadius[i];
-        //        var indexEnd = index;
-
-        //        if (Math.Abs(sRadius.Y) > Mathf.Epsilon)
-        //        {
-        //            var error = Mathf.Abs((int) sRadius.Y) * (int) _cellMatrixSize.Y;
-
-        //            indexEnd = sRadius.Y < 0
-        //                ? index + error
-        //                : index - error;
-        //        }
-
-        //        var xRadius = Mathf.Abs((int)sRadius.X);
-
-        //        if (sRadius.X < 0)
-        //        {
-        //            indexEnd += xRadius;
-        //        }
-        //        else if (sRadius.X > 0)
-        //        {
-        //            indexEnd -= xRadius;
-        //        }
-
-        //        //indexEnd = Mathf.Clamp(indexEnd, 0, _matrixMapCells.Count);
-
-        //        if (indexEnd >= 0 && indexEnd < _matrixMapCells.Count && _matrixMapCells[indexEnd].FreeCell)
-        //        {
-        //            RadiusObjects[i].transform.GetComponent<Renderer>().material = ActiveRegion;
-
-        //            RadiusObjects[i].transform.position = new Vector3(_matrixMapCells[indexEnd].X, _matrixMapCells[indexEnd].Y, 0.1f);
-        //        }
-        //        else
-        //        {
-        //            RadiusObjects[i].transform.GetComponent<Renderer>().material = NoActiveRegion;
-        //        }
-        //    }
-        //}
     }
 }
