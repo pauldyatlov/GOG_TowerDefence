@@ -1,9 +1,9 @@
 ﻿using System;
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-namespace MatrixMap
+namespace Assets.Scripts.Grid
 {
     public class MatrixMapCell : SettlersEngine.IPathNode<object>
     {

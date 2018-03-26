@@ -254,6 +254,7 @@ MonoBehaviour:
     type: 2}
   _barrel: {fileID: 4924326242201182}
   _firePoint: {fileID: 4504216150312354}
+  _damage: 2
   _shootDistance: 10
   _fireRate: 1
   _turnSpeed: 25

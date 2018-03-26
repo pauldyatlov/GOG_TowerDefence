@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Assets.Scripts.Enemy;
 using UnityEngine;
 
 public class Tower : MonoBehaviour
@@ -7,6 +8,7 @@ public class Tower : MonoBehaviour
     [SerializeField] private Transform _barrel;
     [SerializeField] private Transform _firePoint;
 
+    [SerializeField] private float _damage = 10f;
     [SerializeField] private float _shootDistance = 10f;
     [SerializeField] private float _fireRate = 1f;
     [SerializeField] private float _turnSpeed = 1f;
@@ -70,6 +72,6 @@ public class Tower : MonoBehaviour
     {
         var bullet = Instantiate(_projectile, _firePoint.position, _firePoint.rotation);
 
-        bullet.ShootAtTarget(_firePoint.position + _firePoint.transform.forward * 50f);
+        bullet.ShootAtTarget(_firePoint.position + _firePoint.transform.forward * 50f, _damage);
     }
 }

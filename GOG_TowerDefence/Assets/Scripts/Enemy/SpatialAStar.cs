@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Enemy;
 using UnityEngine;
 
 namespace SettlersEngine
@@ -109,12 +110,12 @@ namespace SettlersEngine
             }
         }
 
-        protected virtual double Heuristic(PathNode inStart, PathNode inEnd)
+        protected virtual double Heuristic(PathNode inStart, PathNode inEnd, EPathFormula formula)
         {
             return Math.Sqrt((inStart.X - inEnd.X) * (inStart.X - inEnd.X) + (inStart.Y - inEnd.Y) * (inStart.Y - inEnd.Y));
         }
 
-        protected virtual double NeighborDistance(PathNode inStart, PathNode inEnd)
+        protected virtual double NeighborDistance(PathNode inStart, PathNode inEnd, EPathFormula formula)
         {
             var diffX = Math.Abs(inStart.X - inEnd.X);
             var diffY = Math.Abs(inStart.Y - inEnd.Y);
@@ -133,7 +134,7 @@ namespace SettlersEngine
         /// Returns null, if no path is found. Start- and End-node are included in returned path. The user context
         /// is passed to IsWalkable().
         /// </summary>
-        public LinkedList<TPathNode> Search(Vector2 inStartNode, Vector2 inEndNode, TUserContext inUserContext)
+        public LinkedList<TPathNode> Search(Vector2 inStartNode, Vector2 inEndNode, TUserContext inUserContext, EPathFormula formula)
         {
             var startNode = _searchSpace[(int)inStartNode.x, (int)inStartNode.y];
             var endNode = _searchSpace[(int)inEndNode.x, (int)inEndNode.y];
@@ -157,7 +158,7 @@ namespace SettlersEngine
             }
 
             startNode.G = 0;
-            startNode.H = Heuristic(startNode, endNode);
+            startNode.H = Heuristic(startNode, endNode, formula);
             startNode.F = startNode.H;
 
             _openSet.Add(startNode);
@@ -195,7 +196,7 @@ namespace SettlersEngine
                     if (_closedSet.Contains(y))
                         continue;
 
-                    var tentativeGScore = _runtimeGrid[x].G + NeighborDistance(x, y);
+                    var tentativeGScore = _runtimeGrid[x].G + NeighborDistance(x, y, formula);
                     var wasAdded = false;
 
                     if (!_openSet.Contains(y))
@@ -221,7 +222,7 @@ namespace SettlersEngine
                             _runtimeGrid.Add(y);
 
                         _runtimeGrid[y].G = tentativeGScore;
-                        _runtimeGrid[y].H = Heuristic(y, endNode);
+                        _runtimeGrid[y].H = Heuristic(y, endNode, formula);
                         _runtimeGrid[y].F = _runtimeGrid[y].G + _runtimeGrid[y].H;
 
                         if (wasAdded)

@@ -1,41 +1,48 @@
 ﻿using System.Collections.Generic;
+using Assets.Scripts.Enemy;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private MatrixMap.MatrixMap _matrixMap;
+    [SerializeField] private Assets.Scripts.Grid.MatrixMap _matrixMap;
+
+    [SerializeField] private EnemyController _enemyController;
+    [SerializeField] private UIController _uiController;
 
     [SerializeField] private Tower _tower;
-    [SerializeField] private Enemy _enemy;
-    [SerializeField] private Transform _enemiesContainer;
-
-    private readonly List<Enemy> _spawnedEnemies = new List<Enemy>();
-    private readonly List<Tower> _registeredTowers = new List<Tower>(); 
+    
+    private readonly List<Tower> _registeredTowers = new List<Tower>();
+    private int _currentLivesCount;
 
     private void Awake()
     {
+        _currentLivesCount = Constants.MaxLivesCount;
+
         _matrixMap.Init(RegisterTower);
-
-        var newEnemy = Instantiate(_enemy, Vector3.zero, Quaternion.identity, _enemiesContainer);
-        newEnemy.Init(arg =>
+        _enemyController.Init(_matrixMap, EnemyPassed, arg =>
         {
-            _spawnedEnemies.Remove(arg);
-
-            Destroy(arg.gameObject);
+            foreach (var tower in _registeredTowers) {
+                tower.UpdateEnemiesList(arg);
+            }
         });
 
-        _spawnedEnemies.Add(newEnemy);
+        _uiController.UpdateLivesCount(_currentLivesCount);
+    }
 
-        foreach (var tower in _registeredTowers) {
-            tower.UpdateEnemiesList(_spawnedEnemies);
-        }
+    private void EnemyPassed(Enemy enemy)
+    {
+        _currentLivesCount--;
+
+        _uiController.UpdateLivesCount(_currentLivesCount);
+
+        Destroy(enemy.gameObject);
     }
 
     private void RegisterTower(Tower tower)
     {
         _registeredTowers.Add(tower);
 
-        tower.UpdateEnemiesList(_spawnedEnemies);
+        tower.UpdateEnemiesList(_enemyController.SpawnedEnemies);
     }
 
     private void Update()

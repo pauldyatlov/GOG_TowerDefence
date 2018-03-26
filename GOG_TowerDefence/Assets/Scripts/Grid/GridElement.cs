@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace MatrixMap
+namespace Assets.Scripts.Grid
 {
     public enum EGridElementState
     {

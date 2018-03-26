@@ -1,46 +1,61 @@
 ﻿using System;
-using Assets.Scripts.Enemy;
+using Assets.Scripts.Grid;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+namespace Assets.Scripts.Enemy
 {
-    [SerializeField] private EnemyPathfinding _pathfinding;
-    [SerializeField] private float _maxHealth = 15;
-
-    private Action<Enemy> _onDeath;
-
-    private float _health;
-    private float Health
+    public enum EPathFormula
     {
-        get { return _health; }
-        set
+        Eucledian,
+        EucledianSquared,
+        Diagonal,
+        Manhatten
+    }
+
+    public class Enemy : MonoBehaviour
+    {
+        [SerializeField] private EnemyPathfinding _pathfinding;
+        [SerializeField] private EPathFormula _formula;
+        [SerializeField] private SpriteRenderer _healthBar;
+
+        [SerializeField] private float _maxHealth = 15;
+        [SerializeField] private float _moveSpeed;
+
+        private Action<Enemy> _onDeath;
+
+        private float _health;
+        private float Health
         {
-            _health = value;
+            get { return _health; }
+            set
+            {
+                _healthBar.transform.localScale = new Vector3(1.5f * value / _maxHealth, 3, 1);
 
-            if (_health <= 0)
-                Death();
+                _health = value;
+                
+                if (_health <= 0)
+                    Death();
+            }
         }
-    }
 
-    public void Init(Action<Enemy> onDeath)
-    {
-        Health = _maxHealth;
-        _onDeath = onDeath;
+        public void Init(MatrixMap matrixMap, Action<Enemy> onEnemyPassed, float x, float y, int targetX, int targetY, Action<Enemy> onDeath)
+        {
+            Health = _maxHealth;
+            _onDeath = onDeath;
 
-        gameObject.SetActive(true);
+            _pathfinding.Init(matrixMap, () => { onEnemyPassed(this); }, _formula, _moveSpeed, x, y, targetX, targetY);
+        }
 
-        _pathfinding.Init();
-    }
+        public void TakeDamage(float damage)
+        {
+            Debug.Log("Took (" + damage + ") damage.");
 
-    public void TakeDamage(float damage)
-    {
-        Debug.Log("Took (" + damage + ") damage.");
+            Health -= damage;
+        }
 
-        Health -= damage;
-    }
-
-    private void Death()
-    {
-        _onDeath(this);
+        private void Death()
+        {
+            _onDeath(this);
+        }
     }
 }

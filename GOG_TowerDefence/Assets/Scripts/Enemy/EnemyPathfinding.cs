@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using MatrixMap;
+using Assets.Scripts.Grid;
 using SettlersEngine;
 using UnityEngine;
 
@@ -8,12 +8,12 @@ namespace Assets.Scripts.Enemy
 {
     public class GridPosition
     {
-        public int X;
-        public int Y;
+        public float X;
+        public float Y;
 
         public GridPosition() { }
 
-        public GridPosition(int x, int y)
+        public GridPosition(float x, float y)
         {
             X = x;
             Y = y;
@@ -22,57 +22,49 @@ namespace Assets.Scripts.Enemy
 
     public class EnemyPathfinding : MonoBehaviour
     {
-        private enum EPathFormula
-        {
-            Eucledian,
-            EucledianSquared,
-            Diagonal,
-            Manhatten
-        }
-
-        [SerializeField] private MatrixMap.MatrixMap _matrixMap;
-        [SerializeField] private float _moveSpeed;
-
-        private const EPathFormula Formula = EPathFormula.Eucledian;
+        private MatrixMap _matrixMap;
+        private float _moveSpeed;
 
         private MatrixMapCell _nextNode;
+        private Action _onEnemyPassed;
 
         private GridPosition _currentGridPosition = new GridPosition(0, 0);
         private GridPosition _startGridPosition = new GridPosition();
         private GridPosition _endGridPosition = new GridPosition();
-    
+
         private Vector2 _input;
         private bool _isMoving = true;
         private Vector3 _startPosition;
         private Vector3 _endPosition;
         private float _time;
         private float _factor;
+        private EPathFormula _formula;
 
         public class MySolver<TPathNode, TUserContext> : SpatialAStar<TPathNode, TUserContext> where TPathNode : IPathNode<TUserContext>
         {
-            protected override double Heuristic(PathNode inStart, PathNode inEnd)
+            protected override double Heuristic(PathNode inStart, PathNode inEnd, EPathFormula formula)
             {
                 var dx = Math.Abs(inStart.X - inEnd.X);
                 var dy = Math.Abs(inStart.Y - inEnd.Y);
 
-                switch (Formula)
+                switch (formula)
                 {
                     case EPathFormula.Eucledian:
                         return Math.Sqrt(dx * dx + dy * dy);
                     case EPathFormula.EucledianSquared:
-                        return (dx * dx + dy * dy);
+                        return dx * dx + dy * dy;
                     case EPathFormula.Diagonal:
                         return Math.Min(dx, dy);
                     case EPathFormula.Manhatten:
-                        return (dx * dy) + (dx + dy);
+                        return dx * dy + dx + dy;
                 }
 
                 return Math.Abs(inStart.X - inEnd.X) + Math.Abs(inStart.Y - inEnd.Y);
             }
 
-            protected override double NeighborDistance(PathNode inStart, PathNode inEnd)
+            protected override double NeighborDistance(PathNode inStart, PathNode inEnd, EPathFormula formula)
             {
-                return Heuristic(inStart, inEnd);
+                return Heuristic(inStart, inEnd, formula);
             }
 
             public MySolver(TPathNode[,] inGrid) : base(inGrid)
@@ -80,10 +72,15 @@ namespace Assets.Scripts.Enemy
             }
         }
 
-        public void Init()
+        public void Init(MatrixMap matrixMap, Action onEnemyPassed, EPathFormula formula, float moveSpeed, float x, float y, int targetX, int targetY)
         {
-            _startGridPosition = new GridPosition(0, 0);
-            _endGridPosition = new GridPosition(10, 10);
+            _matrixMap = matrixMap;
+            _onEnemyPassed = onEnemyPassed;
+            _formula = formula;
+            _moveSpeed = moveSpeed;
+
+            _startGridPosition = new GridPosition(x, y);
+            _endGridPosition = new GridPosition(targetX, targetY);
 
             InitializePosition();
 
@@ -99,12 +96,12 @@ namespace Assets.Scripts.Enemy
             _isMoving = false;
         }
 
-        public void FindUpdatedPath(int currentX, int currentY)
+        public void FindUpdatedPath(float currentX, float currentY)
         {
             if (_matrixMap.MatrixMapCells == null) return;
 
             var aStar = new MySolver<MatrixMapCell, object>(_matrixMap.MatrixMapCells);
-            var path = aStar.Search(new Vector2(currentX, currentY), new Vector2(_endGridPosition.X, _endGridPosition.Y), null);
+            var path = aStar.Search(new Vector2(currentX, currentY), new Vector2(_endGridPosition.X, _endGridPosition.Y), null, _formula);
 
             var x = 0;
 
@@ -158,6 +155,11 @@ namespace Assets.Scripts.Enemy
             GetNextMovement();
 
             yield return 0;
+
+            if (Vector3.Distance(_startPosition, _endPosition) <= .1f)
+            {
+                _onEnemyPassed();
+            }
         }
 
         private void UpdatePath()
