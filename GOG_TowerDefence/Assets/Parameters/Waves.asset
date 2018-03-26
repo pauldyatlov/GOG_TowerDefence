@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea8d5580aa3e6e047b8ac6b67cd06d47, type: 3}
+  m_Name: Waves
+  m_EditorClassIdentifier: 
+  SheetName: gogtowerdefence
+  WorksheetName: Waves
+  dataArray:
+  - key: Wave01
+    waveformula: 010000000100000002000000
+    timebeforedeploy: 10
+  - key: Wave02
+    waveformula: 01000000020000000200000001000000
+    timebeforedeploy: 10
+  - key: Wave03
+    waveformula: 01000000020000000200000002000000
+    timebeforedeploy: 10
+  - key: Wave04
+    waveformula: 01000000020000000200000002000000
+    timebeforedeploy: 10
+  - key: Wave05
+    waveformula: 01000000020000000200000002000000
+    timebeforedeploy: 10
+  - key: Wave06
+    waveformula: 01000000020000000200000002000000
+    timebeforedeploy: 10
+  - key: Wave07
+    waveformula: 01000000020000000200000002000000
+    timebeforedeploy: 10
+  - key: Wave08
+    waveformula: 01000000020000000200000002000000
+    timebeforedeploy: 10
+  - key: Wave09
+    waveformula: 01000000020000000200000002000000
+    timebeforedeploy: 10
+  - key: Wave10
+    waveformula: 01000000020000000200000002000000
+    timebeforedeploy: 10

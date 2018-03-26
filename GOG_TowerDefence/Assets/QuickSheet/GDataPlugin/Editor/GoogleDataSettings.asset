@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbcda13c00cae4f4087d84a149a1c70b, type: 3}
+  m_Name: GoogleDataSettings
+  m_EditorClassIdentifier: 
+  RuntimePath: Data/Runtime
+  EditorPath: Data/Editor
+  OAuth2Data:
+    client_id: 851954901987-lmsd0oe19ij68qdn0l05betle825pujg.apps.googleusercontent.com
+    auth_uri: https://accounts.google.com/o/oauth2/auth
+    token_uri: https://accounts.google.com/o/oauth2/token
+    auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
+    client_secret: y3vs01ffGLQBNbvGT-jU7fD1
+    redirect_uris:
+    - urn:ietf:wg:oauth:2.0:oob
+    - http://localhost
+  _AccessCode: 4/AAB5Cf8lwJmSIIezd6FW9KfrJiu4TluJmQQHdyToIuT7d16smqmcPw0
+  _RefreshToken: 1/w1znvDu8xDg1g0G6EQjrUp3aAed4H47XvbUVkOs8l6Q
+  _AccessToken: ya29.GluKBaY7U1nsZiSyHaA-4LA2Cj4Twp_qvoNMSFhckw5Qj1g3vcBnNbI2vBCoG6RuK-FMXKoe-l2T9iKwfcxSSE559QgnV0KjVab5AYCkt_kzc4J_mv_pTe9Or7Wu
