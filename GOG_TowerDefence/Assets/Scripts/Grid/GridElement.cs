@@ -6,6 +6,7 @@ namespace Assets.Scripts.Grid
     public enum EGridElementState
     {
         Default,
+        Occupied,
         Available,
         Unavailable
     }
@@ -13,32 +14,27 @@ namespace Assets.Scripts.Grid
     public class GridElement : MonoBehaviour
     {
         [SerializeField] private SpriteRenderer _spriteRenderer;
-        [SerializeField] private Color _availableColor;
-        [SerializeField] private Color _unavailableColor;
+        [SerializeField] private Sprite _availableSprite;
+        [SerializeField] private Sprite _unavailableSprite;
+        [SerializeField] private Sprite _occupiedSprite;
 
         public MatrixMapCell Cell { get; private set; }
 
-        private Color _defaultColor;
+        private Sprite _defaultSprite;
 
         private Action<GridElement, bool> _onHover;
         private Action<GridElement> _onPlant;
 
         private EGridElementState _currentState;
-        private Tower _currentTower;
 
         public void Init(MatrixMapCell cell, Action<GridElement, bool> onHover, Action<GridElement> onPlant)
         {
-            _defaultColor = _spriteRenderer.color;
+            _defaultSprite = _spriteRenderer.sprite;
 
             Cell = cell;
 
             _onHover = onHover;
             _onPlant = onPlant;
-        }
-
-        public void SetActiveTower(Tower tower)
-        {
-            _currentTower = tower;
         }
 
         private void OnMouseOver()
@@ -66,13 +62,16 @@ namespace Assets.Scripts.Grid
             switch (state)
             {
                 case EGridElementState.Default:
-                    _spriteRenderer.color = _defaultColor;
+                    _spriteRenderer.sprite = _defaultSprite;
                     break;
                 case EGridElementState.Available:
-                    _spriteRenderer.color = _availableColor;
+                    _spriteRenderer.sprite = _availableSprite;
                     break;
                 case EGridElementState.Unavailable:
-                    _spriteRenderer.color = _unavailableColor;
+                    _spriteRenderer.sprite = _unavailableSprite;
+                    break;
+                case EGridElementState.Occupied:
+                    _spriteRenderer.sprite = _occupiedSprite;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("state", state, null);

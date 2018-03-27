@@ -20,4 +20,8 @@ public class EnemiesData
   float movespeed;
   public float Movespeed { get {return movespeed; } set { movespeed = value;} }
   
+  [SerializeField]
+  int reward;
+  public int Reward { get {return reward; } set { reward = value;} }
+  
 }

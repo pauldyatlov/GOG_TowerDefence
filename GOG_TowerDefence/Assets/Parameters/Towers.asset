@@ -14,13 +14,37 @@ MonoBehaviour:
   SheetName: gogtowerdefence
   WorksheetName: Towers
   dataArray:
-  - key: 1
+  - key: 01
+    main: 1
     damage: 10
+    upgradetowers:
+    - 02
+    - 03
     shootdistance: 5
     firerate: 1
     turnspeed: 1
-  - key: 2
+    price: 2
+    iconsprite: tower01_icon
+    towersprite: tower01_sprite
+  - key: 02
+    main: 0
     damage: 15
+    upgradetowers:
+    - 
     shootdistance: 6
     firerate: 0.6
     turnspeed: 1.5
+    price: 1
+    iconsprite: tower02_icon
+    towersprite: tower02_sprite
+  - key: 03
+    main: 0
+    damage: 20
+    upgradetowers:
+    - 
+    shootdistance: 3
+    firerate: 0.75
+    turnspeed: 1.4
+    price: 1
+    iconsprite: tower03_icon
+    towersprite: tower03_sprite

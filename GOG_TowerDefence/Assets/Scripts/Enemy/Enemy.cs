@@ -14,12 +14,33 @@ namespace Assets.Scripts.Enemy
 
     public class Enemy : MonoBehaviour
     {
+        public class EnemyModel
+        {
+            public float MaxHealth;
+            public float MoveSpeed;
+            public int Reward;
+
+            public EnemyModel(float maxHealth, float moveSpeed, int reward)
+            {
+                MaxHealth = maxHealth;
+                MoveSpeed = moveSpeed;
+                Reward = reward;
+            }
+        }
+
         [SerializeField] private EnemyPathfinding _pathfinding;
         [SerializeField] private EPathFormula _formula;
         [SerializeField] private SpriteRenderer _healthBar;
 
         [SerializeField] private float _maxHealth = 15;
-        [SerializeField] private float _moveSpeed;
+        [SerializeField] private float _moveSpeed = 1;
+        [SerializeField] private int _reward = 1;
+
+        public int Reward
+        {
+            get { return _reward; }
+            private set { _reward = value; }
+        }
 
         private Action<Enemy> _onDeath;
 
@@ -36,6 +57,14 @@ namespace Assets.Scripts.Enemy
                 if (_health <= 0)
                     Death();
             }
+        }
+
+        public void SetParameters(EnemyModel parameters)
+        {
+            _maxHealth = parameters.MaxHealth;
+            _moveSpeed = parameters.MoveSpeed;
+
+            Reward = parameters.Reward;
         }
 
         public void Init(MatrixMap matrixMap, Action<Enemy> onEnemyPassed, float x, float y, int targetX, int targetY, Action<Enemy> onDeath)

@@ -4,6 +4,28 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
+    public class TowerModel
+    {
+        public bool Main;
+        public float Damage;
+        public float ShootDistance;
+        public float FireRate;
+        public float TurnSpeed;
+        public int Price;
+        public Sprite Icon;
+
+        public TowerModel(bool main, float damage, float shootDistance, float fireRate, float turnSpeed, int price, Sprite icon)
+        {
+            Main = main;
+            Damage = damage;
+            ShootDistance = shootDistance;
+            FireRate = fireRate;
+            TurnSpeed = turnSpeed;
+            Price = price;
+            Icon = icon;
+        }
+    }
+    
     [SerializeField] private Projectile _projectile;
     [SerializeField] private Transform _barrel;
     [SerializeField] private Transform _firePoint;
@@ -12,13 +34,34 @@ public class Tower : MonoBehaviour
     [SerializeField] private float _shootDistance = 10f;
     [SerializeField] private float _fireRate = 1f;
     [SerializeField] private float _turnSpeed = 1f;
+    [SerializeField] private int _price = 1;
+
+    public int Price
+    {
+        get { return _price; }
+        private set { _price = value; }
+    }
+
+    public TowerModel Model { get; private set; }
 
     private List<Enemy> _enemies = new List<Enemy>();
 
     private float _fireCountdown;
     private Enemy _targetEnemy;
 
-    private void Awake()
+    public void SetParameters(TowerModel parameters)
+    {
+        Model = parameters;
+
+        _damage = parameters.Damage;
+        _shootDistance = parameters.ShootDistance;
+        _fireRate = parameters.FireRate;
+        _turnSpeed = parameters.TurnSpeed;
+
+        Price = parameters.Price;
+    }
+
+    public void Init()
     {
         //todo: change to coroutine + init
         InvokeRepeating("UpdateTargetEnemy", 0, .5f);
@@ -66,6 +109,11 @@ public class Tower : MonoBehaviour
             Shoot();
             _fireCountdown = 1f / _fireRate;
         }
+    }
+
+    private void OnMouseDown()
+    {
+        Debug.LogError("Tower hit");
     }
 
     private void Shoot()

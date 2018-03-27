@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 23753697886954272}
   - component: {fileID: 114360895240259292}
   m_Layer: 0
-  m_Name: Tower
+  m_Name: tower02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -98,7 +98,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1053822703658244}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.8, y: 6.3, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children:
   - {fileID: 4924326242201182}
@@ -254,7 +254,7 @@ MonoBehaviour:
     type: 2}
   _barrel: {fileID: 4924326242201182}
   _firePoint: {fileID: 4504216150312354}
-  _damage: 2
-  _shootDistance: 10
-  _fireRate: 1
-  _turnSpeed: 25
+  _damage: 15
+  _shootDistance: 6
+  _fireRate: 0.6
+  _turnSpeed: 1.5

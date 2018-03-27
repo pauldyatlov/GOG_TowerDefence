@@ -98,7 +98,11 @@ namespace Assets.Scripts.Enemy
 
         public void FindUpdatedPath(float currentX, float currentY)
         {
-            if (_matrixMap.MatrixMapCells == null) return;
+            if (_matrixMap.MatrixMapCells == null)
+            {
+                Debug.LogError("_matrixMap.MatrixMapCells == null");
+                return;
+            }
 
             var aStar = new MySolver<MatrixMapCell, object>(_matrixMap.MatrixMapCells);
             var path = aStar.Search(new Vector2(currentX, currentY), new Vector2(_endGridPosition.X, _endGridPosition.Y), null, _formula);
@@ -173,6 +177,10 @@ namespace Assets.Scripts.Enemy
 
             _input.x = 0;
             _input.y = 0;
+
+            if (_nextNode == null) {
+                return;
+            }
 
             if (_nextNode.X > _currentGridPosition.X)
             {

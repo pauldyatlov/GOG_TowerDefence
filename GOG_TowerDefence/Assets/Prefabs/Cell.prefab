@@ -66,8 +66,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spriteRenderer: {fileID: 212329440664866772}
-  _availableColor: {r: 0.16771193, g: 0.6911765, b: 0.4095887, a: 0.09803922}
-  _unavailableColor: {r: 0.8308824, g: 0.14051686, b: 0.14051686, a: 0.09803922}
+  _availableSprite: {fileID: 21300000, guid: 920b52d18c96a0a40adf2f478fa78f06, type: 3}
+  _unavailableSprite: {fileID: 21300000, guid: 11e4462013c1dcd4ba37a6ddc336273a, type: 3}
+  _occupiedSprite: {fileID: 21300000, guid: 9111007cbd536414abfa259ab6f65222, type: 3}
 --- !u!212 &212329440664866772
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -21,11 +21,19 @@ MonoBehaviour:
     name: KEY
     isEnable: 0
     isArray: 0
+  - type: 8
+    name: Main
+    isEnable: 0
+    isArray: 0
   - type: 5
     name: Damage
     isEnable: 0
     isArray: 0
-  - type: 3
+  - type: 1
+    name: UpgradeTowers
+    isEnable: 0
+    isArray: 1
+  - type: 5
     name: ShootDistance
     isEnable: 0
     isArray: 0
@@ -35,6 +43,18 @@ MonoBehaviour:
     isArray: 0
   - type: 5
     name: TurnSpeed
+    isEnable: 0
+    isArray: 0
+  - type: 3
+    name: Price
+    isEnable: 0
+    isArray: 0
+  - type: 1
+    name: IconSprite
+    isEnable: 0
+    isArray: 0
+  - type: 1
+    name: TowerSprite
     isEnable: 0
     isArray: 0
   AccessCode: 

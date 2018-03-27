@@ -14,9 +14,11 @@ MonoBehaviour:
   SheetName: gogtowerdefence
   WorksheetName: Enemies
   dataArray:
-  - key: 1
+  - key: 01
     maxhealth: 10
     movespeed: 1
-  - key: 2
+    reward: 2
+  - key: 02
     maxhealth: 15
     movespeed: 1.5
+    reward: 2

@@ -73,7 +73,7 @@ namespace Assets.Scripts.Grid
 
                     gridElement.Init(cell, 
                         (element, hover) => OnGridElementHover(element, hover, x, y),
-                        plant => OnGridElementPlant(gridElement, x, y));
+                        plant => OnGridElementPlant());
                 }
             }
 
@@ -85,7 +85,7 @@ namespace Assets.Scripts.Grid
             _selectedTower = tower;
         }
 
-        private void OnGridElementHover(GridElement gridElement, bool status, int x, int y)
+        private void OnGridElementHover(GridElement gridElement, bool hoverStatus, int x, int y)
         {
             if (_selectedTower == null) return;
 
@@ -93,33 +93,44 @@ namespace Assets.Scripts.Grid
 
             foreach (var element in _schemeRadius)
             {
-                var elementAround = MatrixMapCells[x + (int)element.x, y + (int)element.y];
+                var xPos = x + (int) element.x;
+                var yPos = y + (int) element.y;
 
-                _mapCellsAroundTower.Add(elementAround);
-
-                if (status)
+                try
                 {
-                    gridElement.SetActiveTower(_selectedTower);
+                    var elementAround = MatrixMapCells[xPos, yPos];
 
-                    //_selectedTower.transform.SetParent(gridElement.transform);
-                    _selectedTower.transform.position = gridElement.transform.position;
+                    _mapCellsAroundTower.Add(elementAround);
 
-                    var availableStatus = elementAround.FreeCell
-                        ? EGridElementState.Available
-                        : EGridElementState.Unavailable;
+                    if (hoverStatus)
+                    {
+                        _selectedTower.transform.position = gridElement.transform.position;
 
-                    gridElement.SetAreaActive(availableStatus);
-                    elementAround.Object.SetAreaActive(availableStatus);
+                        var availableStatus = elementAround.FreeCell
+                            ? EGridElementState.Available
+                            : EGridElementState.Unavailable;
+
+                        gridElement.SetAreaActive(availableStatus);
+                        elementAround.Object.SetAreaActive(availableStatus);
+                    }
+                    else
+                    {
+                        var availableStatus = elementAround.FreeCell
+                            ? EGridElementState.Default
+                            : EGridElementState.Occupied;
+
+                        gridElement.SetAreaActive(availableStatus);
+                        elementAround.Object.SetAreaActive(availableStatus);
+                    }
                 }
-                else
+                catch (IndexOutOfRangeException)
                 {
-                    gridElement.SetAreaActive(EGridElementState.Default);
-                    elementAround.Object.SetAreaActive(EGridElementState.Default);
+                    gridElement.SetAreaActive(EGridElementState.Unavailable);
                 }
             }
         }
 
-        private void OnGridElementPlant(GridElement gridElement, int x, int y)
+        private void OnGridElementPlant()
         {
             if (_selectedTower == null)
                 return;
@@ -129,11 +140,10 @@ namespace Assets.Scripts.Grid
             }
 
             _onTowerPlant.Invoke(_selectedTower);
-            gridElement.SetActiveTower(_selectedTower);
 
             foreach (var element in _mapCellsAroundTower)
             {
-                element.Object.SetAreaActive(EGridElementState.Default);
+                element.Object.SetAreaActive(EGridElementState.Occupied);
                 element.FreeCell = false;
             }
 
