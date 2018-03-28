@@ -26,4 +26,9 @@ public class TowerIcon : MonoBehaviour, IPointerClickHandler
     {
         _onIconClick(_towerModel);
     }
+
+    public void Close()
+    {
+        Destroy(gameObject);
+    }
 }

@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Enemy;
+using Assets.Scripts.Grid;
 using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
     public class TowerModel
     {
+        public Tower TowerTemplate;
+        public string Id;
         public bool Main;
         public float Damage;
         public float ShootDistance;
@@ -13,9 +16,12 @@ public class Tower : MonoBehaviour
         public float TurnSpeed;
         public int Price;
         public Sprite Icon;
+        public string[] Upgrades;
 
-        public TowerModel(bool main, float damage, float shootDistance, float fireRate, float turnSpeed, int price, Sprite icon)
+        public TowerModel(Tower towerTemplate, string id, bool main, float damage, float shootDistance, float fireRate, float turnSpeed, int price, Sprite icon, string[] upgrades)
         {
+            TowerTemplate = towerTemplate;
+            Id = id;
             Main = main;
             Damage = damage;
             ShootDistance = shootDistance;
@@ -23,6 +29,7 @@ public class Tower : MonoBehaviour
             TurnSpeed = turnSpeed;
             Price = price;
             Icon = icon;
+            Upgrades = upgrades;
         }
     }
     
@@ -43,13 +50,15 @@ public class Tower : MonoBehaviour
     }
 
     public TowerModel Model { get; private set; }
+    public List<TowerModel> Upgrades { get; private set; }
+    public GridElement ParentGridElement { get; set; }
 
     private List<Enemy> _enemies = new List<Enemy>();
 
     private float _fireCountdown;
     private Enemy _targetEnemy;
 
-    public void SetParameters(TowerModel parameters)
+    public void SetParameters(TowerModel parameters, List<TowerModel> upgrades)
     {
         Model = parameters;
 
@@ -59,11 +68,13 @@ public class Tower : MonoBehaviour
         _turnSpeed = parameters.TurnSpeed;
 
         Price = parameters.Price;
+
+        Upgrades = upgrades;
     }
 
     public void Init()
     {
-        //todo: change to coroutine + init
+        //todo: change to coroutine
         InvokeRepeating("UpdateTargetEnemy", 0, .5f);
     }
 
@@ -109,11 +120,6 @@ public class Tower : MonoBehaviour
             Shoot();
             _fireCountdown = 1f / _fireRate;
         }
-    }
-
-    private void OnMouseDown()
-    {
-        Debug.LogError("Tower hit");
     }
 
     private void Shoot()

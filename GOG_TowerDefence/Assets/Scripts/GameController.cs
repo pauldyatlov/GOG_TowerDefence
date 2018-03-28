@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Scripts.Enemy;
+using Assets.Scripts.Grid;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -19,7 +20,7 @@ public class GameController : MonoBehaviour
         _currentLivesCount = Constants.MaxLivesCount;
         _currentMoneyCount = Constants.StartingMoney;
 
-        _matrixMap.Init(RegisterTower);
+        _matrixMap.Init(RegisterTower, PlantedTowerSelected);
         _enemyController.Init(_matrixMap, EnemyPassed, EnemyDead, UpdateTowerEnemyList);
         _towerController.Init(_matrixMap);
 
@@ -38,7 +39,7 @@ public class GameController : MonoBehaviour
 
         if (_currentLivesCount <= 0)
         {
-            throw new NullReferenceException();
+            throw new AccessViolationException();
         }
 
         _uiController.UpdateLivesCount(_currentLivesCount);
@@ -70,5 +71,28 @@ public class GameController : MonoBehaviour
         _uiController.UpdateMoneyCount(_currentMoneyCount);
 
         _towerController.RegisterTower(tower, _enemyController.SpawnedEnemies);
+    }
+
+    private void UnregisterTower(Tower tower)
+    {
+        _towerController.UnregisterTower(tower);
+    }
+
+    private void PlantedTowerSelected(Tower tower)
+    {
+        _uiController.ShowUpgrades(Vector3.zero, tower.Upgrades, arg =>
+        {
+            UnregisterTower(tower);
+
+            var totower = _towerController.TowerTypes[arg];
+
+            var createdTower = Instantiate(totower);
+            createdTower.SetParameters(totower.Model, totower.Upgrades);
+
+            createdTower.transform.SetParent(tower.ParentGridElement.transform);
+            createdTower.transform.localPosition = Vector3.zero;
+
+            RegisterTower(createdTower);
+        });
     }
 }

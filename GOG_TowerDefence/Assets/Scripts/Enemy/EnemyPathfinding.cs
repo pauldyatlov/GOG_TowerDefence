@@ -160,10 +160,11 @@ namespace Assets.Scripts.Enemy
 
             yield return 0;
 
-            if (Vector3.Distance(_startPosition, _endPosition) <= .1f)
-            {
-                _onEnemyPassed();
-            }
+            //todo: enemy passed
+            //if (Vector3.Distance(_startPosition, _endPosition) <= .1f)
+            //{
+            //    _onEnemyPassed();
+            //}
         }
 
         private void UpdatePath()
@@ -190,14 +191,12 @@ namespace Assets.Scripts.Enemy
             if (_nextNode.Y > _currentGridPosition.Y)
             {
                 _input.y = 1;
-                //this.GetComponent<SpriteRenderer>().sprite = Game.carUp;
             }
             if (_nextNode.Y < _currentGridPosition.Y)
             {
                 _input.y = -1;
-                //this.GetComponent<SpriteRenderer>().sprite = Game.carDown;
             }
-            if (_nextNode.X < _currentGridPosition.X)
+             if (_nextNode.X < _currentGridPosition.X)
             {
                 _input.x = -1;
                 //this.GetComponent<SpriteRenderer>().sprite = Game.carBack;

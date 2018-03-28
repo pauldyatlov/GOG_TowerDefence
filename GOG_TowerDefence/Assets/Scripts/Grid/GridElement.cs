@@ -23,9 +23,11 @@ namespace Assets.Scripts.Grid
         private Sprite _defaultSprite;
 
         private Action<GridElement, bool> _onHover;
-        private Action<GridElement> _onPlant;
+        private Action<GridElement> _onClick;
 
         private EGridElementState _currentState;
+
+        public Tower PlantedTower { get; private set; }
 
         public void Init(MatrixMapCell cell, Action<GridElement, bool> onHover, Action<GridElement> onPlant)
         {
@@ -34,7 +36,12 @@ namespace Assets.Scripts.Grid
             Cell = cell;
 
             _onHover = onHover;
-            _onPlant = onPlant;
+            _onClick = onPlant;
+        }
+
+        public void SetPlantedTower(Tower tower)
+        {
+            PlantedTower = tower;
         }
 
         private void OnMouseOver()
@@ -49,7 +56,7 @@ namespace Assets.Scripts.Grid
 
         private void OnMouseDown()
         {
-            _onPlant(this);
+            _onClick(this);
         }
 
         public void SetAreaActive(EGridElementState state)
