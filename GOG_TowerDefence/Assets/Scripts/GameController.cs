@@ -109,9 +109,6 @@ public class GameController : MonoBehaviour
 
     public void PlantedTowerSelected(Tower tower)
     {
-        if (tower.Upgrades == null)
-            return;
-
         var canvasRect = _uiController.transform as RectTransform;
 
         var viewportPosition = Camera.main.WorldToViewportPoint(tower.transform.position);
@@ -142,7 +139,7 @@ public class GameController : MonoBehaviour
         {
             MoneyCountChanged(tower.Price / 2);
 
-            Destroy(tower.gameObject);
+            tower.RemoveTower();
         });
     }
 

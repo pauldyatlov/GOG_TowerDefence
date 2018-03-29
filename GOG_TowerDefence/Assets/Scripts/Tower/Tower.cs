@@ -58,11 +58,11 @@ public class Tower : MonoBehaviour
         get { return _iconSprite; }
     }
 
-    public TowerModel Model { get; protected set; }
-    public List<TowerModel> Upgrades { get; private set; }
+    public List<TowerModel> Upgrades = new List<TowerModel>();
 
+    public TowerModel Model { get; protected set; }
     public GridElement ParentGridElement { get; set; }
-    public IEnumerable<GridElement> OccupiedCells { get; set; } 
+    public MatrixMapCell[] OccupiedCells { get; set; } 
 
     private List<Enemy> _enemies = new List<Enemy>();
 
@@ -142,7 +142,7 @@ public class Tower : MonoBehaviour
 
     public void RemoveTower()
     {
-        foreach (var cell in OccupiedCells.Select(x => x.Cell))
+        foreach (var cell in OccupiedCells)
         {
             cell.Object.SetAreaActive(EGridElementState.Default);
             cell.Occupied = false;

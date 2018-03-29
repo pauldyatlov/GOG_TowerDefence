@@ -168,16 +168,15 @@ namespace Assets.Scripts.Grid
                 }
 
                 gridElement.SetPlantedTower(_selectedTower);
-                gridElement.PlantedTower.OccupiedCells = _mapCellsAroundTower.Select(x => x.Object);
+                gridElement.PlantedTower.OccupiedCells = _mapCellsAroundTower.ToArray();
             }
             else
             {
                 ClearSelectedTower();
             }
 
-            _selectedTower = null;
-
             _mapCellsAroundTower.Clear();
+            _selectedTower = null;
         }
 
         public void ClearSelectedTower()
