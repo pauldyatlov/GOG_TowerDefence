@@ -24,11 +24,8 @@ public class TowerController : MonoBehaviour
             var tower = Resources.Load<Tower>("Towers/tower" + towerData.KEY);
             Assert.IsTrue(tower != null);
 
-            var sprite = Resources.Load<Sprite>("Towers/Icons/" + towerData.Iconsprite);
-            Assert.IsTrue(sprite != null);
-
             var model = new Tower.TowerModel(tower, towerData.KEY, towerData.Main, towerData.Damage, towerData.Shootdistance,
-                towerData.Firerate, towerData.Turnspeed, towerData.Price, sprite, towerData.Upgradetowers);
+                towerData.Firerate, towerData.Turnspeed, tower.IconSprite, towerData.Price, towerData.Upgradetowers);
 
             TowerTypes.Add(model, tower);
         }

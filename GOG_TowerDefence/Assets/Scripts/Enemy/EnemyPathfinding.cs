@@ -23,6 +23,7 @@ namespace Assets.Scripts.Enemy
     public class EnemyPathfinding : MonoBehaviour
     {
         private MatrixMap _matrixMap;
+        private Enemy _enemy;
         private float _moveSpeed;
 
         private MatrixMapCell _nextNode;
@@ -72,9 +73,10 @@ namespace Assets.Scripts.Enemy
             }
         }
 
-        public void Init(MatrixMap matrixMap, Action onEnemyPassed, EPathFormula formula, float moveSpeed, float x, float y, int targetX, int targetY)
+        public void Init(MatrixMap matrixMap, Enemy enemy, Action onEnemyPassed, EPathFormula formula, float moveSpeed, float x, float y, int targetX, int targetY)
         {
             _matrixMap = matrixMap;
+            _enemy = enemy;
             _onEnemyPassed = onEnemyPassed;
             _formula = formula;
             _moveSpeed = moveSpeed;
@@ -105,7 +107,7 @@ namespace Assets.Scripts.Enemy
             }
 
             var aStar = new MySolver<MatrixMapCell, object>(_matrixMap.MatrixMapCells);
-            var path = aStar.Search(new Vector2(currentX, currentY), new Vector2(_endGridPosition.X, _endGridPosition.Y), null, _formula);
+            var path = aStar.Search(new Vector2(currentX, currentY), new Vector2(_endGridPosition.X, _endGridPosition.Y), null, _formula, _enemy.Flying);
 
             var x = 0;
 
@@ -160,11 +162,10 @@ namespace Assets.Scripts.Enemy
 
             yield return 0;
 
-            //todo: enemy passed
-            //if (Vector3.Distance(_startPosition, _endPosition) <= .1f)
-            //{
-            //    _onEnemyPassed();
-            //}
+            //todo: enemy passed on stuck
+            if (Vector3.Distance(_startPosition, _endPosition) <= .1f) {
+                _onEnemyPassed();
+            }
         }
 
         private void UpdatePath()

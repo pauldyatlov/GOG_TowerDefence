@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Assets.Scripts.Enemy;
 using Assets.Scripts.Grid;
 using UnityEngine;
@@ -14,11 +15,11 @@ public class Tower : MonoBehaviour
         public float ShootDistance;
         public float FireRate;
         public float TurnSpeed;
-        public int Price;
         public Sprite Icon;
+        public int Price;
         public string[] Upgrades;
 
-        public TowerModel(Tower towerTemplate, string id, bool main, float damage, float shootDistance, float fireRate, float turnSpeed, int price, Sprite icon, string[] upgrades)
+        public TowerModel(Tower towerTemplate, string id, bool main, float damage, float shootDistance, float fireRate, float turnSpeed, Sprite icon, int price, string[] upgrades)
         {
             TowerTemplate = towerTemplate;
             Id = id;
@@ -27,15 +28,16 @@ public class Tower : MonoBehaviour
             ShootDistance = shootDistance;
             FireRate = fireRate;
             TurnSpeed = turnSpeed;
-            Price = price;
             Icon = icon;
+            Price = price;
             Upgrades = upgrades;
         }
     }
-    
+
     [SerializeField] private Projectile _projectile;
     [SerializeField] private Transform _barrel;
     [SerializeField] private Transform _firePoint;
+    [SerializeField] private Sprite _iconSprite;
 
     [SerializeField] private float _damage = 10f;
     [SerializeField] private float _shootDistance = 10f;
@@ -43,22 +45,31 @@ public class Tower : MonoBehaviour
     [SerializeField] private float _turnSpeed = 1f;
     [SerializeField] private int _price = 1;
 
+    public List<Vector2> Region = new List<Vector2> { Vector2.zero };
+
     public int Price
     {
         get { return _price; }
         private set { _price = value; }
     }
 
-    public TowerModel Model { get; private set; }
+    public Sprite IconSprite
+    {
+        get { return _iconSprite; }
+    }
+
+    public TowerModel Model { get; protected set; }
     public List<TowerModel> Upgrades { get; private set; }
+
     public GridElement ParentGridElement { get; set; }
+    public IEnumerable<GridElement> OccupiedCells { get; set; } 
 
     private List<Enemy> _enemies = new List<Enemy>();
 
     private float _fireCountdown;
     private Enemy _targetEnemy;
 
-    public void SetParameters(TowerModel parameters, List<TowerModel> upgrades)
+    public virtual void SetParameters(TowerModel parameters, List<TowerModel> upgrades)
     {
         Model = parameters;
 
@@ -72,13 +83,13 @@ public class Tower : MonoBehaviour
         Upgrades = upgrades;
     }
 
-    public void Init()
+    public virtual void Init()
     {
         //todo: change to coroutine
         InvokeRepeating("UpdateTargetEnemy", 0, .5f);
     }
 
-    public void UpdateEnemiesList(List<Enemy> enemies)
+    public virtual void UpdateEnemiesList(List<Enemy> enemies)
     {
         _enemies = enemies;
     }
@@ -102,7 +113,7 @@ public class Tower : MonoBehaviour
             _targetEnemy = nearestEnemy;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         _fireCountdown -= Time.deltaTime;
 
@@ -127,5 +138,16 @@ public class Tower : MonoBehaviour
         var bullet = Instantiate(_projectile, _firePoint.position, _firePoint.rotation);
 
         bullet.ShootAtTarget(_firePoint.position + _firePoint.transform.forward * 50f, _damage);
+    }
+
+    public void RemoveTower()
+    {
+        foreach (var cell in OccupiedCells.Select(x => x.Cell))
+        {
+            cell.Object.SetAreaActive(EGridElementState.Default);
+            cell.Occupied = false;
+        }
+
+        Destroy(gameObject);
     }
 }

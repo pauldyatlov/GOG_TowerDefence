@@ -16,35 +16,66 @@ MonoBehaviour:
   dataArray:
   - key: 01
     main: 1
-    damage: 10
+    damage: 0.5
     upgradetowers:
     - 02
     - 03
     shootdistance: 5
-    firerate: 1
-    turnspeed: 1
+    firerate: 0.3
+    turnspeed: 10
     price: 2
-    iconsprite: tower01_icon
-    towersprite: tower01_sprite
   - key: 02
     main: 0
-    damage: 15
+    damage: 0.65
     upgradetowers:
     - 
     shootdistance: 6
     firerate: 0.6
-    turnspeed: 1.5
+    turnspeed: 11.5
     price: 1
-    iconsprite: tower02_icon
-    towersprite: tower02_sprite
   - key: 03
     main: 0
-    damage: 20
+    damage: 0.6
     upgradetowers:
     - 
     shootdistance: 3
-    firerate: 0.75
-    turnspeed: 1.4
+    firerate: 0.5
+    turnspeed: 9.5
     price: 1
-    iconsprite: tower03_icon
-    towersprite: tower03_sprite
+  - key: 04
+    main: 1
+    damage: 0
+    upgradetowers:
+    - 
+    shootdistance: 0
+    firerate: 0
+    turnspeed: 0
+    price: 1
+  - key: 05
+    main: 1
+    damage: 1.2
+    upgradetowers:
+    - 06
+    - 07
+    shootdistance: 5
+    firerate: 0.5
+    turnspeed: 6
+    price: 3
+  - key: 06
+    main: 0
+    damage: 1.5
+    upgradetowers:
+    - 
+    shootdistance: 7
+    firerate: 0.65
+    turnspeed: 11.5
+    price: 2
+  - key: 07
+    main: 0
+    damage: 1.6
+    upgradetowers:
+    - 
+    shootdistance: 4
+    firerate: 0.8
+    turnspeed: 9.5
+    price: 2

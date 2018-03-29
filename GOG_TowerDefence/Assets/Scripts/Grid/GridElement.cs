@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Assets.Scripts.Grid
 {
@@ -18,7 +19,7 @@ namespace Assets.Scripts.Grid
         [SerializeField] private Sprite _unavailableSprite;
         [SerializeField] private Sprite _occupiedSprite;
 
-        public MatrixMapCell Cell { get; private set; }
+        public MatrixMapCell Cell = null;
 
         private Sprite _defaultSprite;
 
@@ -29,11 +30,11 @@ namespace Assets.Scripts.Grid
 
         public Tower PlantedTower { get; private set; }
 
-        public void Init(MatrixMapCell cell, Action<GridElement, bool> onHover, Action<GridElement> onPlant)
+        public void Init(Action<GridElement, bool> onHover, Action<GridElement> onPlant)
         {
-            _defaultSprite = _spriteRenderer.sprite;
+            Cell.Object = this;
 
-            Cell = cell;
+            _defaultSprite = _spriteRenderer.sprite;
 
             _onHover = onHover;
             _onClick = onPlant;
@@ -56,6 +57,9 @@ namespace Assets.Scripts.Grid
 
         private void OnMouseDown()
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
             _onClick(this);
         }
 

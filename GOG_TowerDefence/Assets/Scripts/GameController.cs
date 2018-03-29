@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private Assets.Scripts.Grid.MatrixMap _matrixMap;
+    [SerializeField] private MatrixMap _matrixMap;
 
     [SerializeField] private EnemyController _enemyController;
     [SerializeField] private TowerController _towerController;
@@ -14,57 +14,86 @@ public class GameController : MonoBehaviour
 
     private int _currentLivesCount;
     private int _currentMoneyCount;
+    private int _currentWave = 0;
 
     private void Awake()
     {
         _currentLivesCount = Constants.MaxLivesCount;
         _currentMoneyCount = Constants.StartingMoney;
 
-        _matrixMap.Init(RegisterTower, PlantedTowerSelected);
-        _enemyController.Init(_matrixMap, EnemyPassed, EnemyDead, UpdateTowerEnemyList);
+        _matrixMap.Init(this);
+
+        _enemyController.Init(_matrixMap, this);
         _towerController.Init(_matrixMap);
 
         _uiController.Init(_towerController.TowerTypes.Keys, arg =>
         {
+            _matrixMap.ClearSelectedTower();
             _towerController.GetTowerReady(arg);
+        });
+
+        _uiController.ShowStartNextWaveButton(0, _enemyController.WavesCount, () =>
+        {
+            _enemyController.SpawnNextWave(0);
         });
 
         _uiController.UpdateLivesCount(_currentLivesCount);
         _uiController.UpdateMoneyCount(_currentMoneyCount);
     }
 
-    private void EnemyPassed(Enemy enemy)
+    public void EnemyPassed(Enemy enemy)
     {
         _currentLivesCount--;
 
-        if (_currentLivesCount <= 0)
-        {
-            throw new AccessViolationException();
+        if (_currentLivesCount <= 0) {
+            GameLost();
         }
 
         _uiController.UpdateLivesCount(_currentLivesCount);
     }
 
-    private void EnemyDead(Enemy enemy)
+    public void MoneyCountChanged(int change)
     {
-        _currentMoneyCount += enemy.Reward;
+        _currentMoneyCount += change;
 
         _uiController.UpdateMoneyCount(_currentMoneyCount);
     }
 
-    private void UpdateTowerEnemyList(List<Enemy> enemies)
+    public void UpdateTowerEnemyList(List<Enemy> enemies)
     {
         _towerController.UpdateTowerEnemyList(enemies);
+
+        if (enemies.Count <= 0)
+        {
+            if (_currentWave <= _enemyController.WavesCount - 1)
+            {
+                _currentWave++;
+
+                _uiController.ShowStartNextWaveButton(_currentWave, _enemyController.WavesCount, () =>
+                {
+                    _enemyController.SpawnNextWave(_currentWave);
+                });
+            }
+            else
+            {
+                GameWon();
+            }
+        }
     }
 
-    private void RegisterTower(Tower tower)
+    public bool EnoughMoney(int price)
     {
-        if (_currentMoneyCount < tower.Price)
+        if (_currentMoneyCount < price)
         {
             Debug.LogError("Not enough money!");
-            return;
+            return false;
         }
 
+        return true;
+    }
+
+    public void RegisterTower(Tower tower)
+    {
         Debug.Log("Register tower. Price [" + tower.Price + "]");
 
         _currentMoneyCount -= tower.Price;
@@ -78,21 +107,54 @@ public class GameController : MonoBehaviour
         _towerController.UnregisterTower(tower);
     }
 
-    private void PlantedTowerSelected(Tower tower)
+    public void PlantedTowerSelected(Tower tower)
     {
-        _uiController.ShowUpgrades(Vector3.zero, tower.Upgrades, arg =>
+        if (tower.Upgrades == null)
+            return;
+
+        var canvasRect = _uiController.transform as RectTransform;
+
+        var viewportPosition = Camera.main.WorldToViewportPoint(tower.transform.position);
+        var worldObjectScreenPosition = new Vector2(
+
+        viewportPosition.x * canvasRect.sizeDelta.x - (canvasRect.sizeDelta.x * 0.5f),
+        viewportPosition.y * canvasRect.sizeDelta.y - (canvasRect.sizeDelta.y * 0.5f));
+
+        _uiController.ShowUpgrades(worldObjectScreenPosition, tower.Upgrades, arg =>
         {
-            UnregisterTower(tower);
+            var newTower = _towerController.TowerTypes[arg];
+            
+            if (EnoughMoney(newTower.Price))
+            {
+                var createdTower = Instantiate(newTower);
 
-            var totower = _towerController.TowerTypes[arg];
+                RegisterTower(createdTower);
 
-            var createdTower = Instantiate(totower);
-            createdTower.SetParameters(totower.Model, totower.Upgrades);
+                createdTower.SetParameters(newTower.Model, newTower.Upgrades);
 
-            createdTower.transform.SetParent(tower.ParentGridElement.transform);
-            createdTower.transform.localPosition = Vector3.zero;
+                createdTower.transform.SetParent(tower.ParentGridElement.transform);
+                createdTower.transform.localPosition = Vector3.zero;
 
-            RegisterTower(createdTower);
+                UnregisterTower(tower);
+            }
+        }, 
+        () =>
+        {
+            MoneyCountChanged(tower.Price / 2);
+
+            Destroy(tower.gameObject);
         });
+    }
+
+    public void GameWon()
+    {
+        Time.timeScale = 0f;
+        Debug.LogError("GAME WON");
+    }
+
+    public void GameLost()
+    {
+        Time.timeScale = 0f;
+        Debug.LogError("GAME LOST");
     }
 }

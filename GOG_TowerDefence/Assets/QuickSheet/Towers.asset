@@ -49,12 +49,4 @@ MonoBehaviour:
     name: Price
     isEnable: 0
     isArray: 0
-  - type: 1
-    name: IconSprite
-    isEnable: 0
-    isArray: 0
-  - type: 1
-    name: TowerSprite
-    isEnable: 0
-    isArray: 0
   AccessCode: 

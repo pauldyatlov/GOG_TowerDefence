@@ -134,7 +134,7 @@ namespace SettlersEngine
         /// Returns null, if no path is found. Start- and End-node are included in returned path. The user context
         /// is passed to IsWalkable().
         /// </summary>
-        public LinkedList<TPathNode> Search(Vector2 inStartNode, Vector2 inEndNode, TUserContext inUserContext, EPathFormula formula)
+        public LinkedList<TPathNode> Search(Vector2 inStartNode, Vector2 inEndNode, TUserContext inUserContext, EPathFormula formula, bool flying)
         {
             var startNode = _searchSpace[(int)inStartNode.x, (int)inStartNode.y];
             var endNode = _searchSpace[(int)inEndNode.x, (int)inEndNode.y];
@@ -190,8 +190,9 @@ namespace SettlersEngine
                     if (y == null)
                         continue;
 
-                    if (!y.UserContext.IsWalkable(inUserContext))
-                        continue;
+                    if (!flying)
+                        if (!y.UserContext.IsWalkable(inUserContext))
+                            continue;
 
                     if (_closedSet.Contains(y))
                         continue;

@@ -33,4 +33,8 @@ MonoBehaviour:
     name: Reward
     isEnable: 0
     isArray: 0
+  - type: 8
+    name: Flying
+    isEnable: 0
+    isArray: 0
   AccessCode: 

@@ -12,12 +12,19 @@ public class Projectile : MonoBehaviour
     {
         _targetPosition = targetPosition;
         _damage = damage;
+
+        var direction = targetPosition - transform.position;
+        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
     private void Update()
     {
         var direction = _targetPosition - transform.position;
         var frameDistance = _speed * Time.deltaTime;
+
+        //TODO: maybe change hit to distance
 
         if (direction.magnitude <= frameDistance)
         {
@@ -26,20 +33,17 @@ public class Projectile : MonoBehaviour
         }
 
         transform.Translate(direction.normalized * frameDistance, Space.World);
-
-        transform.rotation = Quaternion.identity;
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
         var enemy = collider.GetComponent<Enemy>();
 
-        if (enemy != null)
-        {
+        if (enemy != null) {
             enemy.TakeDamage(_damage);
-
-            EnemyCollision();
         }
+
+        EnemyCollision();
     }
 
     private void EnemyCollision()

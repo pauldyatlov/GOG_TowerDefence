@@ -19,12 +19,14 @@ namespace Assets.Scripts.Enemy
             public float MaxHealth;
             public float MoveSpeed;
             public int Reward;
+            public bool Flying;
 
-            public EnemyModel(float maxHealth, float moveSpeed, int reward)
+            public EnemyModel(float maxHealth, float moveSpeed, int reward, bool flying)
             {
                 MaxHealth = maxHealth;
                 MoveSpeed = moveSpeed;
                 Reward = reward;
+                Flying = flying;
             }
         }
 
@@ -42,6 +44,8 @@ namespace Assets.Scripts.Enemy
             private set { _reward = value; }
         }
 
+        public bool Flying;
+
         private Action<Enemy> _onDeath;
 
         private float _health;
@@ -50,7 +54,7 @@ namespace Assets.Scripts.Enemy
             get { return _health; }
             set
             {
-                _healthBar.transform.localScale = new Vector3(1.5f * value / _maxHealth, 3, 1);
+                _healthBar.transform.localScale = new Vector3(value / _maxHealth, 3, 1);
 
                 _health = value;
                 
@@ -65,6 +69,7 @@ namespace Assets.Scripts.Enemy
             _moveSpeed = parameters.MoveSpeed;
 
             Reward = parameters.Reward;
+            Flying = parameters.Flying;
         }
 
         public void Init(MatrixMap matrixMap, Action<Enemy> onEnemyPassed, float x, float y, int targetX, int targetY, Action<Enemy> onDeath)
@@ -72,13 +77,11 @@ namespace Assets.Scripts.Enemy
             Health = _maxHealth;
             _onDeath = onDeath;
 
-            _pathfinding.Init(matrixMap, () => { onEnemyPassed(this); }, _formula, _moveSpeed, x, y, targetX, targetY);
+            _pathfinding.Init(matrixMap, this, () => { onEnemyPassed(this); }, _formula, _moveSpeed, x, y, targetX, targetY);
         }
 
         public void TakeDamage(float damage)
         {
-            Debug.Log("Took (" + damage + ") damage.");
-
             Health -= damage;
         }
 

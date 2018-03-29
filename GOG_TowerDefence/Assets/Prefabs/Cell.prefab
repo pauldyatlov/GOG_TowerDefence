@@ -68,7 +68,12 @@ MonoBehaviour:
   _spriteRenderer: {fileID: 212329440664866772}
   _availableSprite: {fileID: 21300000, guid: 920b52d18c96a0a40adf2f478fa78f06, type: 3}
   _unavailableSprite: {fileID: 21300000, guid: 11e4462013c1dcd4ba37a6ddc336273a, type: 3}
-  _occupiedSprite: {fileID: 21300000, guid: 9111007cbd536414abfa259ab6f65222, type: 3}
+  _occupiedSprite: {fileID: 21300000, guid: 18c37d3a00d12b04dac38dc97b1534c9, type: 3}
+  Cell:
+    X: 0
+    Y: 0
+    FreeCell: 0
+    CanBuildHere: 0
 --- !u!212 &212329440664866772
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -102,9 +107,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 1d9b0fa2e9194bb408a32fc92faf8e18, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.09803922}
+  m_SortingOrder: -1
+  m_Sprite: {fileID: 21300000, guid: 18c37d3a00d12b04dac38dc97b1534c9, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

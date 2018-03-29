@@ -24,4 +24,8 @@ public class EnemiesData
   int reward;
   public int Reward { get {return reward; } set { reward = value;} }
   
+  [SerializeField]
+  bool flying;
+  public bool Flying { get {return flying; } set { flying = value;} }
+  
 }

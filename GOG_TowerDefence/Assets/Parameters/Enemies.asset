@@ -15,10 +15,17 @@ MonoBehaviour:
   WorksheetName: Enemies
   dataArray:
   - key: 01
-    maxhealth: 10
-    movespeed: 1
-    reward: 2
-  - key: 02
     maxhealth: 15
+    movespeed: 1
+    reward: 1
+    flying: 0
+  - key: 02
+    maxhealth: 20
     movespeed: 1.5
+    reward: 1
+    flying: 0
+  - key: 03
+    maxhealth: 25
+    movespeed: 1.2
     reward: 2
+    flying: 1

@@ -22,7 +22,7 @@ public class TowerIcon : MonoBehaviour, IPointerClickHandler
         _price.text = towerModel.Price.ToString();
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public virtual void OnPointerClick(PointerEventData eventData)
     {
         _onIconClick(_towerModel);
     }

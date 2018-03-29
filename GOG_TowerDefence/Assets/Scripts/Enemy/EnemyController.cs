@@ -17,54 +17,53 @@ public class EnemyController : MonoBehaviour
     public readonly List<Enemy> SpawnedEnemies = new List<Enemy>();
 
     private MatrixMap _matrixMap;
-    private Action<Enemy> _onEnemyPassed;
-    private Action<Enemy> _onEnemyDead;
-    private Action<List<Enemy>> _onEnemySpawn;
+    private GameController _gameController;
 
     private readonly Dictionary<int, Enemy> _enemyTypes = new Dictionary<int, Enemy>();
 
-    public void Init(MatrixMap matrixMap, Action<Enemy> onEnemyPassed, Action<Enemy> onEnemyDead, Action<List<Enemy>> onEnemySpawn)
+    public int WavesCount
+    {
+        get { return _wavesData.dataArray.Length; }
+    }
+
+    public void Init(MatrixMap matrixMap, GameController gameController)
     {
         _matrixMap = matrixMap;
-        _onEnemySpawn = onEnemySpawn;
-        _onEnemyDead = onEnemyDead;
-        _onEnemyPassed = onEnemyPassed;
+        _gameController = gameController;
 
         foreach (var enemyData in _enemiesData.dataArray)
         {
             var enemy = Resources.Load<Enemy>("Enemies/enemy" + enemyData.KEY);
             Assert.IsTrue(enemy != null);
 
-            enemy.SetParameters(new Enemy.EnemyModel(enemyData.Maxhealth, enemyData.Movespeed, enemyData.Reward));
+            enemy.SetParameters(new Enemy.EnemyModel(enemyData.Maxhealth, enemyData.Movespeed, enemyData.Reward, enemyData.Flying));
 
             int index;
             int.TryParse(enemyData.KEY, out index);
 
             _enemyTypes.Add(index, enemy);
         }
-
-        StartCoroutine(Co_SpawnEnemies());
     }
 
-    private IEnumerator Co_SpawnEnemies()
+    public void SpawnNextWave(int wave)
     {
-        foreach (var wave in _wavesData.dataArray)
-        {
-            foreach (var enemy in wave.Waveformula)
-            {
-                if (_enemyTypes.ContainsKey(enemy))
-                {
-                    SpawnEnemy(_enemyTypes[enemy]);
-                }
-                else
-                {
-                    Debug.LogError("Enemy types does not contain [" + enemy + "]!");
-                }
+        StartCoroutine(Co_SpawnEnemies(wave));
+    }
 
-                yield return new WaitForSeconds(_unitSpawnDelay);
+    private IEnumerator Co_SpawnEnemies(int wave)
+    {
+        foreach (var enemy in _wavesData.dataArray[wave].Waveformula)
+        {
+            if (_enemyTypes.ContainsKey(enemy))
+            {
+                SpawnEnemy(_enemyTypes[enemy]);
+            }
+            else
+            {
+                Debug.LogError("Enemy types does not contain [" + enemy + "]!");
             }
 
-            yield return new WaitForSeconds(wave.Timebeforedeploy);
+            yield return new WaitForSeconds(_unitSpawnDelay);
         }
     } 
 
@@ -78,23 +77,25 @@ public class EnemyController : MonoBehaviour
         {
             RemoveEnemy(arg);
 
-            _onEnemyPassed(arg);
+            _gameController.EnemyPassed(arg);
         }, 
-        randomX, randomY, 10, 10, arg =>
+        randomX, randomY, 17, 9, arg =>
         {
             RemoveEnemy(arg);
 
-            _onEnemyDead(arg);
+            _gameController.MoneyCountChanged(arg.Reward);
         });
 
         SpawnedEnemies.Add(newEnemy);
 
-        _onEnemySpawn(SpawnedEnemies);
+        _gameController.UpdateTowerEnemyList(SpawnedEnemies);
     }
 
     private void RemoveEnemy(Enemy enemy)
     {
         SpawnedEnemies.Remove(enemy);
         Destroy(enemy.gameObject);
+
+        _gameController.UpdateTowerEnemyList(SpawnedEnemies);
     }
 }

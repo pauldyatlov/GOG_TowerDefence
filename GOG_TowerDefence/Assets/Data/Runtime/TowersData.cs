@@ -40,12 +40,4 @@ public class TowersData
   int price;
   public int Price { get {return price; } set { price = value;} }
   
-  [SerializeField]
-  string iconsprite;
-  public string Iconsprite { get {return iconsprite; } set { iconsprite = value;} }
-  
-  [SerializeField]
-  string towersprite;
-  public string Towersprite { get {return towersprite; } set { towersprite = value;} }
-  
 }
