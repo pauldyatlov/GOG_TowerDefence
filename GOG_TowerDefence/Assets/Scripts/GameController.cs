@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.Enemy;
 using Assets.Scripts.Grid;
@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+    [SerializeField] private Camera _camera;
     [SerializeField] private MatrixMap _matrixMap;
 
     [SerializeField] private EnemyController _enemyController;
@@ -65,7 +66,9 @@ public class GameController : MonoBehaviour
 
         if (enemies.Count <= 0)
         {
-            if (_currentWave <= _enemyController.WavesCount - 1)
+            Debug.LogError("Current wave: " + _currentWave + ", count: " + _enemyController.WavesCount);
+
+            if (_currentWave <= _enemyController.WavesCount - 2)
             {
                 _currentWave++;
 
@@ -94,8 +97,6 @@ public class GameController : MonoBehaviour
 
     public void RegisterTower(Tower tower)
     {
-        Debug.Log("Register tower. Price [" + tower.Price + "]");
-
         _currentMoneyCount -= tower.Price;
         _uiController.UpdateMoneyCount(_currentMoneyCount);
 
@@ -140,7 +141,40 @@ public class GameController : MonoBehaviour
             MoneyCountChanged(tower.Price / 2);
 
             tower.RemoveTower();
+            UnregisterTower(tower);
         });
+    }
+
+    public void RemoveLastTower()
+    {
+        _towerController.RemoveLastTower();
+
+        StartCoroutine(Co_CameraShake(.5f, .05f));
+    }
+
+    private IEnumerator Co_CameraShake(float duration, float magnitude)
+    {
+        var elapsed = 0.0f;
+        var originalCamPos = _camera.transform.position;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+
+            var percentComplete = elapsed / duration;
+            var damper = 1.0f - Mathf.Clamp(4.0f * percentComplete - 3.0f, 0.0f, 1.0f);
+
+            var x = Random.value * 2.0f - 1.0f;
+            var y = Random.value * 2.0f - 1.0f;
+            x *= magnitude * damper;
+            y *= magnitude * damper;
+
+            _camera.transform.position = new Vector3(_camera.transform.position.x + x, _camera.transform.position.y + y, originalCamPos.z);
+
+            yield return null;
+        }
+
+        _camera.transform.position = originalCamPos;
     }
 
     public void GameWon()

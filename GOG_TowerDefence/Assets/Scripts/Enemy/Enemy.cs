@@ -1,5 +1,6 @@
 ﻿using System;
 using Assets.Scripts.Grid;
+using Assets.Scripts.Utils;
 using UnityEngine;
 
 namespace Assets.Scripts.Enemy
@@ -12,7 +13,7 @@ namespace Assets.Scripts.Enemy
         Manhatten
     }
 
-    public class Enemy : MonoBehaviour
+    public class Enemy : PoolObject
     {
         public class EnemyModel
         {

@@ -2,6 +2,7 @@
 using System.Linq;
 using Assets.Scripts.Enemy;
 using Assets.Scripts.Grid;
+using Assets.Scripts.Utils;
 using UnityEngine;
 
 public class Tower : MonoBehaviour
@@ -92,6 +93,9 @@ public class Tower : MonoBehaviour
     public virtual void UpdateEnemiesList(List<Enemy> enemies)
     {
         _enemies = enemies;
+
+        if (_enemies.Count <= 0)
+            _targetEnemy = null;
     }
 
     private void UpdateTargetEnemy()
@@ -109,8 +113,16 @@ public class Tower : MonoBehaviour
             }
         }
 
-        if (nearestEnemy != null && shortestDistance <= _shootDistance)
-            _targetEnemy = nearestEnemy;
+        if (nearestEnemy != null)
+        {
+            if (shortestDistance <= _shootDistance)
+            {
+                _targetEnemy = nearestEnemy;
+                return;
+            }
+        }
+
+        _targetEnemy = null;
     }
 
     protected virtual void Update()
@@ -135,9 +147,9 @@ public class Tower : MonoBehaviour
 
     private void Shoot()
     {
-        var bullet = Instantiate(_projectile, _firePoint.position, _firePoint.rotation);
+        var bullet = Pool.PopOrCreate(_projectile, _firePoint.position, _firePoint.rotation);
 
-        bullet.ShootAtTarget(_firePoint.position + _firePoint.transform.forward * 50f, _damage);
+        bullet.ShootAtTarget(_firePoint.position + _firePoint.transform.forward * 50f, _targetEnemy, _damage);
     }
 
     public void RemoveTower()
@@ -147,7 +159,5 @@ public class Tower : MonoBehaviour
             cell.Object.SetAreaActive(EGridElementState.Default);
             cell.Occupied = false;
         }
-
-        Destroy(gameObject);
     }
 }

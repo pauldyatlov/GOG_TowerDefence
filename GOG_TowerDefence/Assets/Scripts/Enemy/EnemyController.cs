@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.Enemy;
 using Assets.Scripts.Grid;
+using Assets.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -63,27 +64,36 @@ public class EnemyController : MonoBehaviour
                 Debug.LogError("Enemy types does not contain [" + enemy + "]!");
             }
 
-            yield return new WaitForSeconds(_unitSpawnDelay);
+            yield return new WaitForSeconds(1f);
         }
-    } 
+
+        Debug.Log("Wave [" + wave + "]. Spawn enemies completed. Count: " + SpawnedEnemies.Count);
+    }
 
     private void SpawnEnemy(Enemy enemy)
     {
         var randomX = UnityEngine.Random.Range(1, 3);
         var randomY = UnityEngine.Random.Range(1, 3);
 
-        var newEnemy = Instantiate(enemy, Vector3.zero, Quaternion.identity, _enemiesContainer);
+        var newEnemy = Pool.PopOrCreate(enemy, Vector3.zero, Quaternion.identity, _enemiesContainer);
+
         newEnemy.Init(_matrixMap, arg =>
         {
-            RemoveEnemy(arg);
+            if (RemoveEnemy(arg))
+            {
+                _gameController.EnemyPassed(arg);
 
-            _gameController.EnemyPassed(arg);
+                Debug.Log("Enemy passed: " + arg.name + ", count: " + SpawnedEnemies.Count);
+            }
         }, 
         randomX, randomY, 17, 9, arg =>
         {
-            RemoveEnemy(arg);
+            if (RemoveEnemy(arg))
+            {
+                _gameController.MoneyCountChanged(arg.Reward);
 
-            _gameController.MoneyCountChanged(arg.Reward);
+                Debug.Log("Enemy dead: " + arg.name + ", count: " + SpawnedEnemies.Count);
+            }
         });
 
         SpawnedEnemies.Add(newEnemy);
@@ -91,11 +101,17 @@ public class EnemyController : MonoBehaviour
         _gameController.UpdateTowerEnemyList(SpawnedEnemies);
     }
 
-    private void RemoveEnemy(Enemy enemy)
+    private bool RemoveEnemy(Enemy enemy)
     {
+        if (!SpawnedEnemies.Contains(enemy))
+            return false;
+
         SpawnedEnemies.Remove(enemy);
-        Destroy(enemy.gameObject);
 
         _gameController.UpdateTowerEnemyList(SpawnedEnemies);
+
+        enemy.Push();
+
+        return true;
     }
 }

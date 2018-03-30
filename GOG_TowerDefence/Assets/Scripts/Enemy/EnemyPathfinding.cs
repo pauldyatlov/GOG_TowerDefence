@@ -127,6 +127,8 @@ namespace Assets.Scripts.Enemy
             else
             {
                 Debug.LogError("I'm stuck!");
+
+                _matrixMap.RemoveLastTower();
             }
         }
 
@@ -136,6 +138,12 @@ namespace Assets.Scripts.Enemy
             {
                 StartCoroutine(Co_Move());
             }
+
+            //todo: enemy passed on stuck
+            if (Vector3.Distance(transform.position, new Vector2(_endGridPosition.X, _endGridPosition.Y)) <= .1f)
+            {
+                _onEnemyPassed();
+            }
         }
 
         public IEnumerator Co_Move()
@@ -143,7 +151,7 @@ namespace Assets.Scripts.Enemy
             _isMoving = true;
             _startPosition = transform.position;
             _time = 0;
-            _factor = 1f;
+            _factor = UnityEngine.Random.Range(.5f, 2f);
 
             _endPosition = new Vector2(_startPosition.x + Math.Sign(_input.x), _startPosition.y + Math.Sign(_input.y));
 
@@ -161,11 +169,6 @@ namespace Assets.Scripts.Enemy
             GetNextMovement();
 
             yield return 0;
-
-            //todo: enemy passed on stuck
-            if (Vector3.Distance(_startPosition, _endPosition) <= .1f) {
-                _onEnemyPassed();
-            }
         }
 
         private void UpdatePath()

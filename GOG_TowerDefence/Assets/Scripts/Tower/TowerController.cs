@@ -51,6 +51,17 @@ public class TowerController : MonoBehaviour
         Destroy(tower.gameObject);
     }
 
+    public void RemoveLastTower()
+    {
+        if (_registeredTowers.Count > 0)
+        {
+            var tower = _registeredTowers.Last();
+
+            tower.RemoveTower();
+            UnregisterTower(tower);
+        }
+    }
+
     public void UpdateTowerEnemyList(List<Enemy> spawnedEnemies)
     {
         foreach (var tower in _registeredTowers)

@@ -193,5 +193,10 @@ namespace Assets.Scripts.Grid
 
             Destroy(_selectedTower.gameObject);
         }
+
+        public void RemoveLastTower()
+        {
+            _gameController.RemoveLastTower();
+        }
     }
 }
