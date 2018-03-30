@@ -18,7 +18,6 @@ public class TowerController : MonoBehaviour
     {
         _matrixMap = matrixMap;
 
-        //TODO: maybe change to scriptable object
         foreach (var towerData in _towersData.dataArray)
         {
             var tower = Resources.Load<Tower>("Towers/tower" + towerData.KEY);

@@ -139,9 +139,7 @@ namespace Assets.Scripts.Enemy
                 StartCoroutine(Co_Move());
             }
 
-            //todo: enemy passed on stuck
-            if (Vector3.Distance(transform.position, new Vector2(_endGridPosition.X, _endGridPosition.Y)) <= .1f)
-            {
+            if (Vector3.Distance(transform.position, new Vector2(_endGridPosition.X, _endGridPosition.Y)) <= .1f) {
                 _onEnemyPassed();
             }
         }

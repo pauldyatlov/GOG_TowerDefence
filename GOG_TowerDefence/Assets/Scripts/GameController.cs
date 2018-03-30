@@ -46,7 +46,10 @@ public class GameController : MonoBehaviour
     {
         _currentLivesCount--;
 
-        if (_currentLivesCount <= 0) {
+        if (_currentLivesCount < 0)
+            return;
+
+        if (_currentLivesCount == 0) {
             GameLost();
         }
 
@@ -66,8 +69,6 @@ public class GameController : MonoBehaviour
 
         if (enemies.Count <= 0)
         {
-            Debug.LogError("Current wave: " + _currentWave + ", count: " + _enemyController.WavesCount);
-
             if (_currentWave <= _enemyController.WavesCount - 2)
             {
                 _currentWave++;
@@ -129,9 +130,15 @@ public class GameController : MonoBehaviour
                 RegisterTower(createdTower);
 
                 createdTower.SetParameters(newTower.Model, newTower.Upgrades);
+                createdTower.OccupiedCells = tower.OccupiedCells;
 
-                createdTower.transform.SetParent(tower.ParentGridElement.transform);
-                createdTower.transform.localPosition = Vector3.zero;
+                foreach (var cell in createdTower.OccupiedCells) {
+                    cell.Object.SetPlantedTower(createdTower);
+                }
+
+                tower.ParentGridElement.SetPlantedTower(createdTower);
+
+                createdTower.transform.position = tower.ParentGridElement.transform.position;
 
                 UnregisterTower(tower);
             }
@@ -179,13 +186,11 @@ public class GameController : MonoBehaviour
 
     public void GameWon()
     {
-        Time.timeScale = 0f;
-        Debug.LogError("GAME WON");
+        _uiController.GameWon();
     }
 
     public void GameLost()
     {
-        Time.timeScale = 0f;
-        Debug.LogError("GAME LOST");
+        _uiController.GameLost();
     }
 }

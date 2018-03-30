@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
@@ -20,11 +21,25 @@ public class UIController : MonoBehaviour
     [SerializeField] private Button _startNextWaveButton;
     [SerializeField] private Text _nextWaveLabel;
 
+    [SerializeField] private GameObject _winScreen;
+    [SerializeField] private GameObject _loseScreen;
+    [SerializeField] private Button _retryButton;
+
     private Action _nextWavePressed;
     private readonly List<TowerIcon> _upgradeViews = new List<TowerIcon>();
 
     private void Awake()
     {
+        _retryButton.onClick.AddListener(() =>
+        {
+            SceneManager.LoadScene("Gameplay");
+
+            _loseScreen.SetActive(false);
+            _winScreen.SetActive(false);
+
+            _retryButton.gameObject.SetActive(false);
+        });
+
         _startNextWaveButton.onClick.AddListener(() =>
         {
             _startNextWaveButton.gameObject.SetActive(false);
@@ -99,5 +114,17 @@ public class UIController : MonoBehaviour
     public void UpdateMoneyCount(int count)
     {
         _remainingMoney.text = count.ToString();
+    }
+
+    public void GameLost()
+    {
+        _loseScreen.SetActive(true);
+        _retryButton.gameObject.SetActive(true);
+    }
+
+    public void GameWon()
+    {
+        _winScreen.SetActive(true);
+        _retryButton.gameObject.SetActive(true);
     }
 }

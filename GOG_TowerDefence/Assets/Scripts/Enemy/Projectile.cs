@@ -27,8 +27,6 @@ public class Projectile : PoolObject
         var direction = _target.transform.position - transform.position;
         var frameDistance = _speed * Time.deltaTime;
 
-        //TODO: maybe change hit to distance
-
         if (direction.magnitude <= frameDistance)
         {
             _target.TakeDamage(_damage);
