@@ -64,7 +64,7 @@ public class EnemyController : MonoBehaviour
                 Debug.LogError("Enemy types does not contain [" + enemy + "]!");
             }
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0f);
         }
 
         Debug.Log("Wave [" + wave + "]. Spawn enemies completed. Count: " + SpawnedEnemies.Count);
